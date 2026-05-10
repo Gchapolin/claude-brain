@@ -1,0 +1,40 @@
+# Conteudo pessoal — nunca versionar
+**/Pendencias/*.md
+**/Geral/*.md
+**/Notas Pendentes/*.md
+**/notes/
+
+# Graphify output (gerado, nao versionar)
+**/graphify-out/
+
+# Obsidian: workspace state, cache (per-user)
+**/.obsidian/workspace.json
+**/.obsidian/workspace-mobile.json
+**/.obsidian/workspaces.json
+**/.obsidian/cache
+**/.obsidian/community-plugins.json
+**/.obsidian/core-plugins.json
+**/.obsidian/core-plugins-migration.json
+**/.obsidian/hotkeys.json
+
+# Plugin binaries — usuarios instalam via Obsidian UI
+**/.obsidian/plugins/*/main.js
+**/.obsidian/plugins/*/styles.css
+**/.obsidian/plugins/*/manifest.json
+**/.obsidian/plugins/*/data.json
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor caches
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+firebase-debug.log

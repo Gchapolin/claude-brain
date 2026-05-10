@@ -1,0 +1,15 @@
+{
+  "search": "-path:.canvas -path:_canvas/",
+  "showAttachments": false,
+  "showOrphans": false,
+  "hideUnresolved": true,
+  "showTags": false,
+  "centerStrength": 0.18,
+  "repelStrength": 30,
+  "linkStrength": 0.5,
+  "linkDistance": 250,
+  "scale": 0.6,
+  "colorGroups": [
+    { "query": "file:Index", "color": { "a": 1, "rgb": 16777215 } }
+  ]
+}

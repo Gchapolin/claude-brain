@@ -1,0 +1,408 @@
+/* ClaudeBrain Hub — estilo Proposta 3 (Notion/Linear) */
+
+.brain-hub {
+  --bg2: #202020;
+  --bg3: #262626;
+  --hover: #2a2a2a;
+  --border: #2f2f2f;
+  --fg-faint: #6a6a6a;
+  --accent: #7f6df2;
+
+  /* Escala de fontes padronizada */
+  --fs-xs: 11px;   /* labels uppercase, pills, badges, hints, headers de tabela */
+  --fs-sm: 13px;   /* base — body, tabs, filters, celulas de tabela */
+  --fs-md: 14px;   /* nome de projeto, links destacados */
+  --fs-lg: 22px;   /* KPI valores */
+
+  /* Override readable line length so a tabela ocupa toda a largura */
+  --max-width: 100%;
+  --line-width: 100%;
+  --file-line-width: 100%;
+}
+
+/* Base font-size do hub inteiro */
+.brain-hub,
+.brain-hub p,
+.brain-hub div {
+  font-size: var(--fs-sm);
+}
+
+/* Esconde Propriedades + titulo inline (redundante com a aba) — frontmatter editavel via Cmd+P */
+.brain-hub .metadata-container,
+.brain-hub .metadata-properties-heading,
+.brain-hub .inline-title,
+.markdown-preview-view.brain-hub .inline-title,
+.markdown-source-view.brain-hub .inline-title {
+  display: none !important;
+}
+
+/* Wide page com padding lateral consistente — base da margem = onde a tabela renderiza */
+.markdown-preview-view.brain-hub,
+.markdown-source-view.brain-hub {
+  max-width: none !important;
+}
+.markdown-preview-view.brain-hub .markdown-preview-section,
+.markdown-source-view.brain-hub .cm-sizer {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+.brain-hub .markdown-preview-sizer {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 40px !important;
+  padding-right: 40px !important;
+  box-sizing: border-box !important;
+}
+
+/* KPI strip — flexbox pra largura previsivel */
+.brain-hub .kpis {
+  display: flex !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 18px 0 22px;
+  box-sizing: border-box;
+}
+.brain-hub .kpi {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  background: var(--bg2);
+  padding: 14px 18px;
+  box-sizing: border-box;
+  border-right: 1px solid var(--border);
+  overflow: hidden;
+}
+.brain-hub .kpi:last-child {
+  border-right: 0;
+}
+.brain-hub .kpi .v {
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-normal);
+  line-height: 1.1;
+}
+.brain-hub .kpi .l {
+  font-size: var(--fs-xs);
+  color: var(--fg-faint);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 2px;
+}
+
+/* SHOTGUN — forca botoes inline em todos os modos */
+body .brain-hub .block-language-button,
+body .brain-hub div.block-language-button,
+body .brain-hub .el-pre,
+body .brain-hub div.el-pre,
+body .brain-hub p:has(> .block-language-button),
+body .brain-hub > div > div:has(> .block-language-button),
+body .brain-hub .markdown-preview-section > div:has(.block-language-button),
+body .brain-hub div:has(> button.button-default) {
+  display: inline-block !important;
+  margin: 0 6px 6px 0 !important;
+  vertical-align: top !important;
+  width: auto !important;
+}
+body .brain-hub button.button-default,
+body .brain-hub button {
+  display: inline-block !important;
+  width: auto !important;
+  margin: 0 !important;
+  padding: 7px 14px !important;
+  border-radius: 6px !important;
+  font-size: var(--fs-sm) !important;
+  font-weight: 500 !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg3) !important;
+  color: var(--text-normal) !important;
+  cursor: pointer;
+}
+body .brain-hub button.purple {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+body .brain-hub button.blue {
+  background: #2a4f73 !important;
+  border-color: #355d8a !important;
+  color: #fff !important;
+}
+body .brain-hub button:hover {
+  filter: brightness(1.15);
+}
+
+/* Section headings */
+.brain-hub h2 {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .08em !important;
+  color: var(--fg-faint) !important;
+  margin: 28px 0 12px !important;
+  padding-bottom: 0 !important;
+  border-bottom: 0 !important;
+}
+
+/* Dataview tables */
+.brain-hub .dataview.table-view-table,
+.brain-hub table.dataview {
+  background: var(--bg2);
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: var(--fs-sm);
+  border-collapse: collapse;
+  width: 100%;
+}
+.brain-hub .dataview thead th {
+  background: var(--bg3) !important;
+  text-align: left;
+  padding: 10px 14px !important;
+  font-size: var(--fs-xs) !important;
+  color: var(--fg-faint) !important;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border) !important;
+}
+.brain-hub .dataview tbody td {
+  padding: 11px 14px !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.brain-hub .dataview tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+.brain-hub .dataview tbody tr:hover td {
+  background: var(--hover);
+}
+.brain-hub .dataview tbody td a.internal-link {
+  color: var(--text-normal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.brain-hub .dataview tbody td a.internal-link:hover {
+  color: var(--accent);
+}
+
+/* DataviewJS wrapper — remove padding/margin extra em toda a hierarquia */
+body .brain-hub .block-language-dataviewjs,
+body .brain-hub .block-language-dataview,
+body .brain-hub div.dataview,
+body .brain-hub .cm-embed-block,
+body .brain-hub .cm-preview-code-block,
+body .markdown-preview-view.brain-hub .block-language-dataviewjs,
+body .markdown-source-view.brain-hub .block-language-dataviewjs,
+body .markdown-rendered.brain-hub .block-language-dataviewjs {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
+}
+/* Tambem remove margem dos pais em alguns niveis */
+body .brain-hub .markdown-preview-section > div:has(.block-language-dataviewjs),
+body .brain-hub p:has(.block-language-dataviewjs) {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Tab system (custom DataviewJS UI) */
+.brain-hub .ts-root {
+  margin: 18px 0;
+  width: 100%;
+}
+.brain-hub .ts-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-sm);
+  margin-bottom: 0;
+}
+.brain-hub .ts-tab {
+  padding: 10px 16px;
+  color: var(--fg-faint);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  transition: color .12s;
+}
+.brain-hub .ts-tab:hover {
+  color: var(--text-normal);
+}
+.brain-hub .ts-tab.active {
+  color: var(--text-normal);
+  border-bottom-color: var(--accent);
+}
+.brain-hub .ts-tab .ts-badge {
+  background: var(--bg3);
+  color: var(--fg-faint);
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+.brain-hub .ts-tab.active .ts-badge {
+  background: rgba(127,109,242,.2);
+  color: var(--accent);
+}
+
+.brain-hub .ts-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  font-size: var(--fs-sm);
+  color: var(--fg-faint);
+  flex-wrap: wrap;
+}
+.brain-hub .ts-search {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 6px 10px;
+  color: var(--text-normal);
+  font-size: var(--fs-sm);
+  width: 220px;
+  outline: none;
+}
+.brain-hub .ts-search:focus {
+  border-color: var(--accent);
+}
+.brain-hub .ts-select {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: var(--text-normal);
+  font-size: var(--fs-sm);
+  outline: none;
+  cursor: pointer;
+}
+.brain-hub .ts-counter {
+  margin-left: auto;
+  color: var(--fg-faint);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom tab content table */
+.brain-hub .ts-table {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  margin: 0;
+}
+.brain-hub .ts-table thead th {
+  background: var(--bg3);
+  text-align: left;
+  padding: 10px 14px;
+  font-size: var(--fs-xs);
+  color: var(--fg-faint);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+.brain-hub .ts-table tbody td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-normal);
+  vertical-align: middle;
+}
+.brain-hub .ts-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.brain-hub .ts-table tbody tr:hover td {
+  background: var(--hover);
+}
+.brain-hub .ts-table td.muted {
+  color: var(--fg-faint);
+  font-size: var(--fs-sm);
+}
+.brain-hub .ts-table td.num {
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-faint);
+}
+.brain-hub .ts-name a.internal-link {
+  color: var(--text-normal);
+  text-decoration: none;
+  font-weight: 500;
+}
+.brain-hub .ts-name a.internal-link:hover {
+  color: var(--accent);
+}
+.brain-hub .ts-name .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.brain-hub .dot-purple   { background: #7f6df2; }
+.brain-hub .dot-blue     { background: #5b9bd5; }
+.brain-hub .dot-green    { background: #5cb85c; }
+.brain-hub .dot-pink     { background: #d96fa8; }
+.brain-hub .dot-orange   { background: #e8a45c; }
+.brain-hub .dot-lavender { background: #c4b8ff; }
+.brain-hub .dot-yellow   { background: #e0c850; }
+.brain-hub .dot-gray     { background: #999;    }
+
+/* Pills (stack tags) */
+.brain-hub .pill {
+  display: inline-block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-family: "SF Mono", Menlo, monospace;
+  margin-right: 3px;
+  letter-spacing: .04em;
+}
+.brain-hub .pill-sw   { background: rgba(225,164,210,.15); color: #e1a4d2; }  /* Swift   */
+.brain-hub .pill-kt   { background: rgba(158,225,158,.15); color: #9ee19e; }  /* Kotlin  */
+.brain-hub .pill-js   { background: rgba(225,217,158,.15); color: #e1d99e; }  /* JS      */
+.brain-hub .pill-ts   { background: rgba(158,192,232,.15); color: #9ec0e8; }  /* TS      */
+.brain-hub .pill-html { background: rgba(189,177,240,.15); color: #bdb1f0; }  /* HTML    */
+.brain-hub .pill-py   { background: rgba(158,192,232,.15); color: #9ec0e8; }  /* Python  */
+.brain-hub .pill-rs   { background: rgba(232,184,158,.15); color: #e8b89e; }  /* Rust    */
+.brain-hub .pill-work { background: rgba(224,200,80,.18);  color: #e0c850; }  /* Trabalho*/
+
+/* Status dot */
+.brain-hub .status-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.brain-hub .status-active { background: #5cb85c; box-shadow: 0 0 6px #5cb85c66; }
+.brain-hub .status-work   { background: #e0c850; }
+.brain-hub .status-empty  { background: #6a6a6a; }
+
+/* Footer hints */
+.brain-hub .hints {
+  color: var(--fg-faint);
+  font-size: var(--fs-xs);
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  line-height: 1.7;
+}
+.brain-hub .hints b { color: var(--text-normal); }

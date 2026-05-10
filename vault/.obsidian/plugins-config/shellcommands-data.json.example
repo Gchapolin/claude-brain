@@ -1,0 +1,26 @@
+{
+  "settings_version": "0.23.0",
+  "obsidian_command_palette_prefix": "Execute: ",
+  "show_autocomplete_menu": true,
+  "default_shells": { "darwin": "/bin/zsh" },
+  "environment_variable_path_augmentations": {
+    "darwin": "/opt/homebrew/bin:/usr/local/bin:${HOME}/.local/bin"
+  },
+  "shell_commands": [
+    {
+      "id": "atualizar-tudo",
+      "alias": "ClaudeBrain: Atualizar tudo",
+      "platform_specific_commands": {
+        "default": "${HOME}/.local/bin/claudebrain-update.sh"
+      },
+      "shells": { "darwin": "/bin/zsh" },
+      "icon": "lucide-refresh-cw",
+      "command_palette_availability": "enabled",
+      "output_handlers": {
+        "stdout": "notification",
+        "stderr": "notification"
+      },
+      "execution_notification_mode": "if-long"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "editorPosition": "right",
+  "attachShortcutToGlobalWindow": false,
+  "globalNamespace": "MF",
+  "formDefinitions": [
+    {
+      "title": "Capturar nota",
+      "name": "capturar-nota",
+      "customClassname": "",
+      "fields": [
+        {
+          "name": "projeto",
+          "label": "Projeto",
+          "description": "Onde a nota pertence",
+          "input": {
+            "type": "select",
+            "source": "fixed",
+            "options": [
+              { "value": "Projeto1", "label": "Projeto1" },
+              { "value": "Projeto2", "label": "Projeto2" },
+              { "value": "geral", "label": "(geral, sem projeto)" }
+            ]
+          }
+        },
+        {
+          "name": "titulo",
+          "label": "Titulo",
+          "description": "Titulo curto da nota",
+          "input": { "type": "text", "hidden": false }
+        },
+        {
+          "name": "conteudo",
+          "label": "Conteudo",
+          "description": "O que voce quer registrar",
+          "input": { "type": "textarea", "hidden": false }
+        },
+        {
+          "name": "tags",
+          "label": "Tags (opcional)",
+          "description": "Separadas por virgula. Ex: bug, urgente",
+          "isRequired": false,
+          "input": { "type": "text", "hidden": false }
+        }
+      ],
+      "version": "1"
+    }
+  ]
+}
