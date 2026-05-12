@@ -17,7 +17,7 @@ const tagsList = tagsRaw ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean)
 const date = tp.date.now("YYYY-MM-DD");
 const time = tp.date.now("HH-mm");
 
-const safeTitulo = titulo.replace(/[\\\/:\*\?\"<>\|]/g, "-").replace(/\s+/g, " ").trim();
+const safeTitulo = titulo.replace(/[\\/:*?"<>|]/g, "-").replace(/\s+/g, " ").trim();
 const filename = `${date} ${time} ${safeTitulo}`;
 const filepath = `Notas Pendentes/${filename}.md`;
 

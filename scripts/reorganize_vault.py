@@ -88,6 +88,8 @@ def reorganize(vault_dir: Path):
                         sf = full
                         resolved += 1
                 src_dir = Path(sf).parent
+                # Filtra '..', '/', '.' pra evitar path traversal — uma nota
+                # com source_file: "../../../etc/passwd" nao deve escapar do vault.
                 parts = [p for p in src_dir.parts if p not in ('', '..', '/', '.')]
                 if parts:
                     dest = vault_dir.joinpath(*parts) / name

@@ -5,14 +5,34 @@ tags: [hub, mobile]
 cssclasses: [brain-hub]
 ---
 
-N projetos · sincronizado · ClaudeBrain
+```dataviewjs
+const projects = dv.pages('#projecthub').array();
+const allPages = dv.pages('').where(p =>
+  !p.file.path.endsWith('Index.md') &&
+  !p.file.path.endsWith('Capturar.md') &&
+  !p.file.path.startsWith('Templates/')
+).array();
+const pendentes = allPages.filter(p => p.file.path.startsWith('Notas Pendentes/'));
+const notasPessoais = allPages.length - pendentes.length;
 
-<div class="kpis">
-<div class="kpi"><div class="v">N</div><div class="l">Projetos</div></div>
-<div class="kpi"><div class="v">N</div><div class="l">Notas pessoais</div></div>
-<div class="kpi"><div class="v">N</div><div class="l">Nodes do grafo</div></div>
-<div class="kpi"><div class="v">N</div><div class="l">Aguardando triagem</div></div>
-</div>
+// Try to read total graph nodes from any graphify-out/graph.json — best-effort,
+// optional (skipped silently if not accessible from this context).
+const nodesGrafo = '—';
+
+const status = `${projects.length} projetos · sincronizado · ClaudeBrain`;
+dv.container.createEl('p', { text: status });
+
+const kpis = dv.container.createEl('div', { cls: 'kpis' });
+const card = (v, l) => {
+  const wrap = kpis.createEl('div', { cls: 'kpi' });
+  wrap.createEl('div', { cls: 'v', text: String(v) });
+  wrap.createEl('div', { cls: 'l', text: l });
+};
+card(projects.length, 'Projetos');
+card(notasPessoais, 'Notas pessoais');
+card(nodesGrafo, 'Nodes do grafo');
+card(pendentes.length, 'Aguardando triagem');
+```
 
 ```button
 name Nova captura

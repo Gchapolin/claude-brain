@@ -13,7 +13,7 @@ Tempo estimado: ~30 minutos pra setup inicial.
 
 ```bash
 brew install uv
-uv tool install graphifyy
+uv tool install graphifyy   # pacote PyPI tem 2 y; o binario CLI e `graphify` (1 y)
 graphify install
 ```
 

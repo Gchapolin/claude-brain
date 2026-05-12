@@ -104,6 +104,41 @@ A fonte de verdade das notas Pendencias/Geral vive em **iCloud Drive** (`~/Libra
 
 ## Setup
 
+Voce tem duas opcoes:
+
+### A) Setup guiado via Claude Code (recomendado)
+
+```bash
+git clone <repo-url> ~/PROJETOS/claude-brain
+cd ~/PROJETOS/claude-brain
+bash scripts/install-skill.sh
+```
+
+Depois, dentro do Claude Code (qualquer diretorio):
+
+```
+/claudebrain-init
+```
+
+O skill detecta seu estado atual, pergunta antes de cada fase, e aplica so o que voce aprovar. Idempotente — pode rodar de novo depois pra adicionar projetos novos.
+
+Suporta `--dry-run` (mostra o que faria) e `--only 2,3` (roda so fases especificas).
+
+**O que e automatizado:**
+- Criacao do vault e copia do template
+- Download dos plugins do Obsidian nas versoes pinadas em `plugins.lock.json` (GitHub releases)
+- Aplicacao dos configs dos plugins (.example -> data.json)
+- Symlinks dos projetos com `graphify-out/`
+- Mirror das pastas via `reorganize_vault.py`
+- Dropdown do Modal Forms com seus projetos
+- Symlinks iCloud por projeto
+
+**O que NAO da pra automatizar (limitacao do Obsidian):**
+- "Trust author" dos plugins comunitarios (1 click vault-wide na primeira abertura)
+- Toggle do CSS snippet `brain-hub` em Settings -> Aparencia
+
+### B) Setup manual
+
 Veja `docs/SETUP.md` pro passo-a-passo. Resumido:
 
 1. Instalar [graphify](https://github.com/safishamsi/graphify) e gerar o grafo de cada projeto

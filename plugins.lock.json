@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "_comment": "Versoes pinadas dos plugins do Obsidian. Geradas a partir do vault de referencia. Para atualizar: rodar scripts/init/refresh_lock.sh (TODO) ou editar a mao.",
+  "plugins": [
+    {
+      "id": "dataview",
+      "folder": "dataview",
+      "repo": "blacksmithgu/obsidian-dataview",
+      "version": "0.5.68",
+      "assets": ["main.js", "manifest.json", "styles.css"],
+      "required": true,
+      "config_example": "dataview-data.json.example"
+    },
+    {
+      "id": "templater-obsidian",
+      "folder": "templater-obsidian",
+      "repo": "SilentVoid13/Templater",
+      "version": "2.20.3",
+      "assets": ["main.js", "manifest.json", "styles.css"],
+      "required": true,
+      "config_example": "templater-data.json.example"
+    },
+    {
+      "id": "modalforms",
+      "folder": "modalforms",
+      "repo": "danielo515/obsidian-modal-form",
+      "version": "1.65.1",
+      "assets": ["main.js", "manifest.json", "styles.css"],
+      "required": true,
+      "config_example": "modalforms-data.json.example"
+    },
+    {
+      "id": "buttons",
+      "folder": "buttons",
+      "repo": "shabegom/buttons",
+      "version": "0.9.13",
+      "assets": ["main.js", "manifest.json", "styles.css"],
+      "required": true,
+      "config_example": null
+    },
+    {
+      "id": "obsidian-shellcommands",
+      "folder": "shellcommands",
+      "repo": "Taitava/obsidian-shellcommands",
+      "version": "0.23.0",
+      "assets": ["main.js", "manifest.json", "styles.css"],
+      "required": true,
+      "config_example": "shellcommands-data.json.example"
+    },
+    {
+      "id": "meld-encrypt",
+      "folder": "meld-encrypt",
+      "repo": "meld-cp/obsidian-encrypt",
+      "version": "2.4.5",
+      "assets": ["main.js", "manifest.json", "styles.css"],
+      "required": false,
+      "config_example": null
+    }
+  ],
+  "obsidian_core_configs": [
+    {"example": "app.json.example", "target": "app.json"},
+    {"example": "graph.json.example", "target": "graph.json"},
+    {"example": "types.json.example", "target": "types.json"}
+  ]
+}

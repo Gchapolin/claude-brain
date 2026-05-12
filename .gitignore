@@ -17,7 +17,8 @@
 **/.obsidian/core-plugins-migration.json
 **/.obsidian/hotkeys.json
 
-# Plugin binaries — usuarios instalam via Obsidian UI
+# Plugin binaries — baixados via /claudebrain-init (Fase 2) a partir de plugins.lock.json
+# Nao versionar, sao recuperaveis pelo install_plugins.py
 **/.obsidian/plugins/*/main.js
 **/.obsidian/plugins/*/styles.css
 **/.obsidian/plugins/*/manifest.json
