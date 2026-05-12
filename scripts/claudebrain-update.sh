@@ -173,12 +173,33 @@ if [ ${#ALL_DROPDOWN_PROJECTS[@]} -gt 0 ]; then
     fi
 fi
 
+# Reconcilia auto-detect: pra cada projeto cujo hub ainda nao tem 'description'
+# (ex: integrado por uma versao antiga do script, sem auto-detect), roda
+# update_hub_frontmatter.py --auto. Idempotente — nao sobrescreve hubs ja
+# preenchidos.
+AUTOFRONT_REC="$REPO/scripts/update_hub_frontmatter.py"
+RECONCILED=()
+if [ -f "$AUTOFRONT_REC" ]; then
+    for name in "${ALL_DROPDOWN_PROJECTS[@]}"; do
+        hub="$ICLOUD/$name/$name.md"
+        [ -f "$hub" ] || continue
+        if ! grep -q '^description:' "$hub"; then
+            python3 "$AUTOFRONT_REC" --project "$name" --auto \
+                --projetos-root "$PROJETOS" --icloud "$ICLOUD" >/dev/null 2>&1 \
+                && RECONCILED+=("$name") \
+                || ERRORS+=("reconciliacao auto-detect falhou pra $name")
+        fi
+    done
+fi
+
 # Print summary
 echo "=== ClaudeBrain — Atualizar ==="
 echo "Grafos atualizados: ${#UPDATED_GRAPHS[@]}"
 [ ${#UPDATED_GRAPHS[@]} -gt 0 ] && printf '  - %s\n' "${UPDATED_GRAPHS[@]}"
 echo "Projetos novos: ${#NEW_PROJECTS[@]}"
 [ ${#NEW_PROJECTS[@]} -gt 0 ] && printf '  + %s\n' "${NEW_PROJECTS[@]}"
+echo "Auto-detect (catch-up): ${#RECONCILED[@]}"
+[ ${#RECONCILED[@]} -gt 0 ] && printf '  > %s\n' "${RECONCILED[@]}"
 [ -z "$GRAPHIFY_BIN" ] && echo "AVISO: graphify nao esta no PATH — updates de grafo pulados"
 [ ${#ERRORS[@]} -gt 0 ] && {
     echo "Erros: ${#ERRORS[@]}"

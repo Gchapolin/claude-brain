@@ -145,14 +145,14 @@ A lista vem da Fase 3.
 
 **Pergunta**: "Instalar `claudebrain-update.sh` em `~/.local/bin/`? (Permite detectar projetos novos e re-graphificar via botao no Index)"
 
-Se sim:
+Se sim — usar **symlink** (nao cp) pra que git pulls no repo propaguem direto:
 ```bash
 mkdir -p "$HOME/.local/bin"
-cp "$REPO/scripts/claudebrain-update.sh" "$HOME/.local/bin/"
-chmod +x "$HOME/.local/bin/claudebrain-update.sh"
+ln -sfn "$REPO/scripts/claudebrain-update.sh" "$HOME/.local/bin/claudebrain-update.sh"
+chmod +x "$REPO/scripts/claudebrain-update.sh"
 ```
 
-Depois, INSPECIONE o script e veja se ele tem variaveis hardcoded (`PROJETOS=`, `ICLOUD=`). Se sim, pergunte ao usuario se os defaults batem com o setup dele. Se nao, ofereca editar in-place via `sed`.
+Se o usuario quer caminhos custom (`PROJETOS`, `ICLOUD`), oriente a passar via env vars (o script ja respeita `${PROJETOS:-...}` etc) — nao editar o script in-place.
 
 Cheque que `~/.local/bin` esta no `$PATH` do usuario. Se nao, avise.
 

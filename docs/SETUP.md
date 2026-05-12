@@ -97,11 +97,13 @@ Aponta pro script `~/.local/bin/claudebrain-update.sh`.
 
 ```bash
 mkdir -p ~/.local/bin
-cp scripts/claudebrain-update.sh ~/.local/bin/
-chmod +x ~/.local/bin/claudebrain-update.sh
+ln -sfn "$(pwd)/scripts/claudebrain-update.sh" ~/.local/bin/claudebrain-update.sh
+chmod +x scripts/claudebrain-update.sh
 ```
 
-Edita o script pra ajustar caminhos (`PROJETOS=`, `ICLOUD=`, etc.) se voce tem layout diferente.
+**Por que symlink, nao cp?** Updates no repo (git pull) propagam direto pro `~/.local/bin/`. Se voce copiar, a copia fica stale.
+
+Pra ajustar caminhos sem editar o script: use env vars (`PROJETOS=...`, `ICLOUD=...`, `REPO=...`) no Shell Commands plugin ou no env do shell.
 
 ## 8. Mirror das pastas dos projetos
 
