@@ -1,6 +1,6 @@
 # ClaudeBrain
 
-Setup de Obsidian opinionado pra usar como **segundo cerebro de desenvolvimento** quando voce tem multiplos projetos de codigo localmente. Combina:
+Setup de Obsidian opinativo pra usar como **segundo cerebro de desenvolvimento** quando voce tem multiplos projetos de codigo localmente. Combina:
 
 - **Graphify** (knowledge graph por projeto, queryable pelo Claude Code)
 - **Vault Obsidian unificado** com cada projeto como subpasta
@@ -21,7 +21,7 @@ A estrutura nao e arbitraria. Cada pasta tem um proposito explicito ligado a **c
 
 ```
 ClaudeBrain/
-├── Index.md                 hub central — KPIs, projetos, captures
+├── Index.md                 hub central — KPIs, projetos, capturas
 ├── Capturar.md              pagina-form pra criar nota nova
 ├── Notas Pendentes/         INBOX — captures aguardando triagem
 ├── Templates/
@@ -29,7 +29,7 @@ ClaudeBrain/
 ├── _seeds/                  notas-stub que alimentam autocomplete (status, etc)
 └── <Projeto>/               UM por projeto sob ~/PROJETOS
     ├── <Projeto>.md         hub do projeto (frontmatter + wikilinks)
-    ├── Pendencias/          itens acionaveis nao-resolvidos
+    ├── Pendencias/          itens acionaveis nao resolvidos
     ├── Geral/               conhecimento operacional recorrente
     ├── _root/               notas geradas de arquivos no root do projeto
     ├── _communities/        notas-resumo por cluster do graphify
@@ -47,7 +47,7 @@ Quando voce captura uma ideia rapida (botao "Nova captura" no Index, ou Cmd+P �
 
 A nota tem `status: pendente` no frontmatter. Quando voce processar (triar) — move pra `Pendencias/` ou `Geral/` do projeto correspondente, ou deleta.
 
-#### `<Projeto>/Pendencias/` — items acionaveis
+#### `<Projeto>/Pendencias/` — itens acionaveis
 Bugs conhecidos, TODOs, decisoes a tomar, configuracoes manuais a fazer. Tudo o que demanda **acao futura**. Aqui voce escreve a mao (depois de triagem ou direto pro projeto).
 
 A regra: se voce ler a nota e nao houver nada pra fazer, ela nao pertence aqui — pertence a `Geral/`.
@@ -86,7 +86,7 @@ Voce pode esconder do file explorer com `Settings → Files & Links → Excluded
 
 ### Pastas no nivel `~/PROJETOS/<projeto>/`
 
-Cada projeto local tem sua pasta `notes/Pendencias/` e `notes/Geral/` que sao **symlinks pra iCloud**. Isso significa:
+Cada projeto local tem suas pastas `notes/Pendencias/` e `notes/Geral/` que sao **symlinks pra iCloud**. Isso significa:
 
 ```
 ~/PROJETOS/<Projeto>/
@@ -120,7 +120,7 @@ Depois, dentro do Claude Code (qualquer diretorio):
 /claudebrain-init
 ```
 
-O skill detecta seu estado atual, pergunta antes de cada fase, e aplica so o que voce aprovar. Idempotente — pode rodar de novo depois pra adicionar projetos novos.
+A skill detecta seu estado atual, pergunta antes de cada fase, e aplica so o que voce aprovar. Idempotente — pode rodar de novo depois pra adicionar projetos novos.
 
 Suporta `--dry-run` (mostra o que faria) e `--only 2,3` (roda so fases especificas).
 
@@ -144,10 +144,10 @@ Veja `docs/SETUP.md` pro passo-a-passo. Resumido:
 1. Instalar [graphify](https://github.com/safishamsi/graphify) e gerar o grafo de cada projeto
 2. Criar o vault do Obsidian em `~/PROJETOS/Obsidian/ClaudeBrain/`
 3. Copiar o conteudo de `vault/` deste repo pra raiz do seu vault
-4. Instalar plugins community: **Dataview**, **Templater**, **Modal Forms**, **Buttons**, **Shell Commands** (Mac), **Meld Encrypt** (opcional)
-5. Aplicar configs em `vault/.obsidian/plugins-config/*.json.example` (renomeie pra `data.json` no folder do plugin)
+4. Instalar plugins da comunidade: **Dataview**, **Templater**, **Modal Forms**, **Buttons**, **Shell Commands** (Mac), **Meld Encrypt** (opcional)
+5. Aplicar configs em `vault/.obsidian/plugins-config/*.json.example` (renomeie pra `data.json` na pasta do plugin)
 6. Copiar `scripts/claudebrain-update.sh` pra `~/.local/bin/` e dar permissao executavel
-7. Pra cada projeto, rodar `scripts/reorganize_vault.py <projeto/graphify-out/obsidian>` pra mirror da estrutura
+7. Pra cada projeto, rodar `scripts/reorganize_vault.py <projeto/graphify-out/obsidian>` pra espelhar a estrutura
 
 ---
 
@@ -164,11 +164,11 @@ Veja `docs/SETUP.md` pro passo-a-passo. Resumido:
 
 ## Filosofia de captura → triagem
 
-Inspirado em Tiago Forte's PARA + Karpathy's "LLM Wiki":
+Inspirado no PARA do Tiago Forte + na "LLM Wiki" do Karpathy:
 
 1. **Captura**: rapido, sem decidir onde fica. Nota cai em `Notas Pendentes/` com `status: pendente`.
 2. **Revisao**: voltando pro Mac, voce abre o Index → tab "Notas Pendentes" → triagem nota a nota.
-3. **Decisao binaria**: ou move pra `<projeto>/Pendencias/` (acionavel) ou `<projeto>/Geral/` (referencia), ou deleta.
+3. **Triagem**: ou move pra `<projeto>/Pendencias/` (acionavel), ou pra `<projeto>/Geral/` (referencia), ou deleta.
 4. **Processamento**: o `claudebrain-update.sh` re-roda o graphify pra incorporar tudo no grafo.
 
 Resultado: voce nao decide na hora. Captura sempre. Decide quando esta com a cabeca pra isso.
@@ -179,7 +179,7 @@ Resultado: voce nao decide na hora. Captura sempre. Decide quando esta com a cab
 
 - **Obsidian 1.5+** (Mac, Windows, Linux, iOS, Android)
 - **macOS** pra usar o `claudebrain-update.sh` (Shell Commands plugin so funciona em desktop)
-- **iCloud Drive** pro sync mobile (alternativas: Obsidian Sync $4/mes, Syncthing free)
+- **iCloud Drive** pro sync mobile (alternativas: Obsidian Sync $4/mes, Syncthing gratuito)
 - **Python 3.10+** pros scripts auxiliares
 
 ---
@@ -192,4 +192,4 @@ MIT — ver `LICENSE`.
 
 ## Disclaimer
 
-Este e um **template de setup pessoal** que funciona pra mim. Pode nao ser ideal pra voce. Adapta livremente. Issues e PRs sao bem-vindos mas nao garanto manutencao ativa.
+Este e um **template de setup pessoal** que funciona pra mim. Pode nao ser ideal pra voce. Adapte livremente. Issues e PRs sao bem-vindos mas nao garanto manutencao ativa.
