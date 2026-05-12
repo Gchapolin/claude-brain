@@ -102,6 +102,17 @@ Projeto detectado em \`~/PROJETOS/$name\`. Sem grafo de codigo ainda — rode \`
 (use [[Capturar]] e seleciona projeto = $name)
 EOF
     fi
+
+    # Auto-detect stack/description/color via update_hub_frontmatter.py --auto.
+    # Best-effort: erros nao bloqueiam o setup (campos ficam vazios e voce
+    # preenche depois manual).
+    AUTOFRONT="$REPO/scripts/update_hub_frontmatter.py"
+    if [ -f "$AUTOFRONT" ]; then
+        python3 "$AUTOFRONT" --project "$name" --auto \
+            --projetos-root "$PROJETOS" --icloud "$ICLOUD" 2>/dev/null \
+            || ERRORS+=("auto-detect falhou pra $name (campos ficam vazios)")
+    fi
+
     NEW_PROJECTS+=("$name")
 }
 
