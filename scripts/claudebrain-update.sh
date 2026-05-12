@@ -66,9 +66,11 @@ setup_new_project() {
     mkdir -p "$d/notes"
     mkdir -p "$ICLOUD/$name/Pendencias"
     mkdir -p "$ICLOUD/$name/Geral"
+    mkdir -p "$ICLOUD/$name/Sessoes"
 
     ensure_notes_symlink "$d/notes/Pendencias" "$ICLOUD/$name/Pendencias" "$name"
     ensure_notes_symlink "$d/notes/Geral" "$ICLOUD/$name/Geral" "$name"
+    ensure_notes_symlink "$d/notes/Sessoes" "$ICLOUD/$name/Sessoes" "$name"
 
     if [ ! -L "$MAC_VAULT/$name" ] && [ ! -e "$MAC_VAULT/$name" ]; then
         ln -sfn "$ICLOUD/$name" "$MAC_VAULT/$name"

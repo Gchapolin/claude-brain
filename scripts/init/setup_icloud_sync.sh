@@ -67,5 +67,7 @@ ensure_symlink() {
 ensure_dir "$PROJ_NOTES"
 ensure_dir "$ICLOUD_PROJ/Pendencias"
 ensure_dir "$ICLOUD_PROJ/Geral"
+ensure_dir "$ICLOUD_PROJ/Sessoes"
 ensure_symlink "$ICLOUD_PROJ/Pendencias" "$PROJ_NOTES/Pendencias"
 ensure_symlink "$ICLOUD_PROJ/Geral" "$PROJ_NOTES/Geral"
+ensure_symlink "$ICLOUD_PROJ/Sessoes" "$PROJ_NOTES/Sessoes"
