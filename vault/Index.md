@@ -5,34 +5,7 @@ tags: [hub, mobile]
 cssclasses: [brain-hub]
 ---
 
-```dataviewjs
-const projects = dv.pages('#projecthub').array();
-const allPages = dv.pages('').where(p =>
-  !p.file.path.endsWith('Index.md') &&
-  !p.file.path.endsWith('Capturar.md') &&
-  !p.file.path.startsWith('Templates/')
-).array();
-const pendentes = allPages.filter(p => p.file.path.startsWith('Notas Pendentes/'));
-const notasPessoais = allPages.length - pendentes.length;
-
-// Try to read total graph nodes from any graphify-out/graph.json — best-effort,
-// optional (skipped silently if not accessible from this context).
-const nodesGrafo = '—';
-
-const status = `${projects.length} projetos · sincronizado · ClaudeBrain`;
-dv.container.createEl('p', { text: status });
-
-const kpis = dv.container.createEl('div', { cls: 'kpis' });
-const card = (v, l) => {
-  const wrap = kpis.createEl('div', { cls: 'kpi' });
-  wrap.createEl('div', { cls: 'v', text: String(v) });
-  wrap.createEl('div', { cls: 'l', text: l });
-};
-card(projects.length, 'Projetos');
-card(notasPessoais, 'Notas pessoais');
-card(nodesGrafo, 'Nodes do grafo');
-card(pendentes.length, 'Aguardando triagem');
-```
+<!-- status line + KPIs sao renderizados pelo dataviewjs abaixo (uma so query, KPI e tabs sempre concordam) -->
 
 ```button
 name Nova captura
@@ -76,6 +49,21 @@ const counts = { projetos: projects.length, pendentes: pendentes.length };
 
 // Build root
 const root = dv.container.createEl('div', { cls: 'ts-root' });
+
+// Status line + KPIs (mesmo source que o tab bar — sem race condition entre blocks)
+root.createEl('p', { text: `${projects.length} projetos · sincronizado · ClaudeBrain`, cls: 'ts-status' });
+const kpisHost = root.createEl('div', { cls: 'kpis' });
+const kpiCard = (v, l) => {
+  const wrap = kpisHost.createEl('div', { cls: 'kpi' });
+  wrap.createEl('div', { cls: 'v', text: String(v) });
+  wrap.createEl('div', { cls: 'l', text: l });
+};
+const notasPessoais = allPages.length - pendentes.length;
+const totalNotesGrafo = projects.reduce((s, p) => s + (p.notes_count || 0), 0);
+kpiCard(projects.length, 'Projetos');
+kpiCard(notasPessoais, 'Notas pessoais');
+kpiCard(totalNotesGrafo || '—', 'Nodes do grafo');
+kpiCard(pendentes.length, 'Aguardando triagem');
 
 // Tab bar
 const tabBar = root.createEl('div', { cls: 'ts-tabs' });
