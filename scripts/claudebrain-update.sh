@@ -10,7 +10,9 @@
 #   ICLOUD    (default: $HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/ClaudeBrain-Mobile)
 #   MAC_VAULT (default: $PROJETOS/Obsidian/ClaudeBrain)
 #   REPO      (default: $HOME/PROJETOS/claude-brain) — onde estao scripts/init/
-#   SKIP      (default: "Obsidian claude-brain") — pastas a ignorar (separadas por espaco)
+#   SKIP             (default: "Obsidian claude-brain") — pastas ignoradas na integracao com vault
+#   DROPDOWN_SKIP    (default: "Obsidian") — pastas ignoradas no dropdown do Modal Forms
+#                    (claude-brain entra no dropdown pq voce captura notas sobre o repo)
 
 set -u
 
@@ -19,8 +21,10 @@ ICLOUD="${ICLOUD:-$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Cl
 MAC_VAULT="${MAC_VAULT:-$PROJETOS/Obsidian/ClaudeBrain}"
 REPO="${REPO:-$HOME/PROJETOS/claude-brain}"
 SKIP="${SKIP:-Obsidian claude-brain}"
+DROPDOWN_SKIP="${DROPDOWN_SKIP:-Obsidian}"
 
 read -r -a SKIP_PROJECTS <<< "$SKIP"
+read -r -a DROPDOWN_SKIP_ARR <<< "$DROPDOWN_SKIP"
 
 GRAPHIFY_BIN="$(command -v graphify || true)"
 
@@ -126,14 +130,29 @@ for d in "$PROJETOS"/*/; do
     fi
 done
 
-# Update Modal Forms dropdown if new projects added (incremental, idempotent)
-if [ ${#NEW_PROJECTS[@]} -gt 0 ]; then
+# Reconcilia o dropdown do Modal Forms SEMPRE (idempotente).
+# Lista todos os projetos em $PROJETOS minus DROPDOWN_SKIP, e usa --mode add.
+# Inclui projetos que o usuario adicionou ao vault manualmente (sem passar
+# por setup_new_project) e tambem claude-brain (que e skip de integracao
+# mas deve aparecer pra capturar notas sobre o repo).
+ALL_DROPDOWN_PROJECTS=()
+for d in "$PROJETOS"/*/; do
+    [ -d "$d" ] || continue
+    name=$(basename "$d")
+    skip=0
+    for s in "${DROPDOWN_SKIP_ARR[@]}"; do
+        [[ "$name" == "$s" ]] && skip=1 && break
+    done
+    [ "$skip" = "1" ] && continue
+    ALL_DROPDOWN_PROJECTS+=("$name")
+done
+
+if [ ${#ALL_DROPDOWN_PROJECTS[@]} -gt 0 ]; then
     INJECT="$REPO/scripts/init/inject_modalforms_projects.py"
     if [ ! -f "$INJECT" ]; then
         ERRORS+=("inject_modalforms_projects.py nao encontrado em $INJECT (REPO=$REPO)")
     else
-        # Build JSON list to safely pass names with spaces/quotes
-        PROJECTS_JSON=$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "${NEW_PROJECTS[@]}")
+        PROJECTS_JSON=$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1:]))' "${ALL_DROPDOWN_PROJECTS[@]}")
         for VAULT_DIR in "$MAC_VAULT" "$ICLOUD"; do
             if [ -d "$VAULT_DIR/.obsidian/plugins/modalforms" ]; then
                 python3 "$INJECT" --vault "$VAULT_DIR" --mode add --projects-json "$PROJECTS_JSON" \
@@ -154,4 +173,13 @@ echo "Projetos novos: ${#NEW_PROJECTS[@]}"
     echo "Erros: ${#ERRORS[@]}"
     printf '  ! %s\n' "${ERRORS[@]}"
 }
+
+# Force Obsidian to re-render Index.md (dataview KPIs).
+# Sem isso, mudancas em pastas symlinkadas pro iCloud podem nao disparar
+# o file watcher do Obsidian no vault Mac, e os KPIs ficam estagnados ate
+# voce trocar de aba e voltar.
+for VAULT_DIR in "$MAC_VAULT" "$ICLOUD"; do
+    [ -f "$VAULT_DIR/Index.md" ] && touch "$VAULT_DIR/Index.md" 2>/dev/null || true
+done
+
 echo "Done. $(date '+%H:%M:%S')"
