@@ -29,6 +29,13 @@
           "input": { "type": "text", "hidden": false }
         },
         {
+          "name": "slug",
+          "label": "Slug (opcional)",
+          "description": "Identificador URL-safe da pendencia. Se vazio, usa o titulo.",
+          "isRequired": false,
+          "input": { "type": "text", "hidden": false }
+        },
+        {
           "name": "conteudo",
           "label": "Conteudo",
           "description": "O que voce quer registrar",
