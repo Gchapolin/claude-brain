@@ -38,14 +38,54 @@ const state = { tab: 'projetos', filter: '', status: 'todos', stack: 'todos' };
 
 // Data
 const projects = dv.pages('#projecthub').sort(p => p.file.name).array();
-const allPages = dv.pages('').where(p =>
-  !p.file.path.endsWith('Index.md') &&
-  !p.file.path.endsWith('Capturar.md') &&
-  !p.file.path.startsWith('Templates/')
-).array();
-const pendentes = allPages.filter(p => p.file.path.startsWith('Notas Pendentes/'));
 
-const counts = { projetos: projects.length, pendentes: pendentes.length };
+// Pendencias index: walks <Projeto>/Pendencias/<slug>/{spec,task,tests,resultado}.md
+const pendIndex = {}; // { projeto: { slug: { spec:true, task:true, tests:true, resultado:true } } }
+let legadoTotal = 0;
+const legadoByProj = {}; // { projeto: N }
+for (const p of dv.pages('').array()) {
+  const parts = p.file.path.split('/');
+  const idxPend = parts.indexOf('Pendencias');
+  if (idxPend === -1 || idxPend === 0) continue;
+  const projeto = parts[idxPend - 1];
+  if (parts.length === idxPend + 2 && parts[idxPend + 1].endsWith('.md')) {
+    legadoTotal++;
+    legadoByProj[projeto] = (legadoByProj[projeto] || 0) + 1;
+    continue;
+  }
+  if (parts.length === idxPend + 3 && ['spec.md','task.md','tests.md','resultado.md'].includes(parts[idxPend + 2])) {
+    const slug = parts[idxPend + 1];
+    const fname = parts[idxPend + 2].replace('.md','');
+    pendIndex[projeto] = pendIndex[projeto] || {};
+    pendIndex[projeto][slug] = pendIndex[projeto][slug] || {};
+    pendIndex[projeto][slug][fname] = true;
+  }
+}
+
+function classify(files) {
+  const has = k => !!files[k];
+  if (!has('spec')) return 'invalid';
+  if (!has('task')) return (has('tests') || has('resultado')) ? 'invalid' : 'aberta';
+  if (!has('tests')) return has('resultado') ? 'invalid' : 'planejamento';
+  if (!has('resultado')) return 'pronta';
+  return 'realizada';
+}
+
+const stages = ['aberta','planejamento','pronta','realizada'];
+const byProjeto = {};
+const globalCounts = { aberta:0, planejamento:0, pronta:0, realizada:0 };
+for (const projeto of Object.keys(pendIndex)) {
+  byProjeto[projeto] = { aberta:0, planejamento:0, pronta:0, realizada:0 };
+  for (const slug of Object.keys(pendIndex[projeto])) {
+    const s = classify(pendIndex[projeto][slug]);
+    if (stages.includes(s)) {
+      byProjeto[projeto][s]++;
+      globalCounts[s]++;
+    }
+  }
+}
+
+const counts = { projetos: projects.length, pendencias: globalCounts.aberta + globalCounts.planejamento + globalCounts.pronta };
 
 // Build root
 const root = dv.container.createEl('div', { cls: 'ts-root' });
@@ -58,16 +98,25 @@ const kpiCard = (v, l) => {
   wrap.createEl('div', { cls: 'v', text: String(v) });
   wrap.createEl('div', { cls: 'l', text: l });
 };
-const notasPessoais = allPages.length - pendentes.length;
 const totalNotesGrafo = projects.reduce((s, p) => s + (p.notes_count || 0), 0);
 kpiCard(projects.length, 'Projetos');
-kpiCard(notasPessoais, 'Notas pessoais');
+kpiCard(globalCounts.aberta, 'Aberta');
+kpiCard(globalCounts.planejamento, 'Planejamento');
+kpiCard(globalCounts.pronta, 'Pronta');
+kpiCard(globalCounts.realizada, 'Realizada');
 kpiCard(totalNotesGrafo || '—', 'Nodes do grafo');
-kpiCard(pendentes.length, 'Aguardando triagem');
+
+// Legado banner
+if (legadoTotal > 0) {
+  const banner = root.createEl('div', { cls: 'legado-banner' });
+  banner.createEl('strong', { text: `${legadoTotal} pendencia(s) em formato legado` });
+  const detail = Object.entries(legadoByProj).map(([p, n]) => `${p}: ${n}`).join(' · ');
+  banner.createEl('span', { text: ` (${detail}). Rode /pendencia migrate <projeto> pra converter.` });
+}
 
 // Tab bar
 const tabBar = root.createEl('div', { cls: 'ts-tabs' });
-[['projetos','Projetos'],['pendentes','Notas Pendentes']].forEach(([id, label]) => {
+[['projetos','Projetos'],['pendencias','Pendencias']].forEach(([id, label]) => {
   const tab = tabBar.createEl('span', { cls: 'ts-tab' + (state.tab === id ? ' active' : ''), attr: { 'data-id': id } });
   tab.createEl('span', { text: label });
   tab.createEl('span', { text: String(counts[id]), cls: 'ts-badge' });
@@ -105,7 +154,7 @@ function render() {
   filterBar.style.display = state.tab === 'projetos' ? '' : 'none';
   content.innerHTML = '';
   if (state.tab === 'projetos') renderProjetos();
-  else if (state.tab === 'pendentes') renderPendentes();
+  else if (state.tab === 'pendencias') renderPendencias();
 }
 
 function renderProjetos() {
@@ -132,16 +181,25 @@ function renderProjetos() {
     </table>`;
 }
 
-function renderPendentes() {
+function renderPendencias() {
+  const rows = Object.keys(byProjeto).sort();
+  if (rows.length === 0) {
+    content.innerHTML = '<p class="muted">Nenhuma pendencia em cascata.</p>';
+    return;
+  }
+  const totalCol = stages.map(s => `<th class="num">${s}</th>`).join('');
   content.innerHTML = `
     <table class="ts-table">
-      <thead><tr><th>Nota</th><th>Projeto</th><th>Capturada</th></tr></thead>
-      <tbody>${pendentes.map(p => `
-        <tr>
-          <td>${fileLink(p)}</td>
-          <td class="muted">${escapeHtml(p.project || '—')}</td>
-          <td class="num">${dt(p.file.ctime)}</td>
-        </tr>`).join('') || '<tr><td colspan="3" class="muted">Nada na fila de triagem.</td></tr>'}
+      <thead><tr><th>Projeto</th>${totalCol}<th class="num">total</th></tr></thead>
+      <tbody>${rows.map(proj => {
+        const c = byProjeto[proj];
+        const total = stages.reduce((s, k) => s + c[k], 0);
+        return `<tr>
+          <td class="ts-name">${escapeHtml(proj)}</td>
+          ${stages.map(s => `<td class="num">${c[s]}</td>`).join('')}
+          <td class="num"><strong>${total}</strong></td>
+        </tr>`;
+      }).join('')}
       </tbody>
     </table>`;
 }

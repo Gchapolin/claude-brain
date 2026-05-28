@@ -102,6 +102,37 @@ A fonte de verdade das notas Pendencias/Geral vive em **iCloud Drive** (`~/Libra
 
 ---
 
+## Cascata de pendencias
+
+Cada pendencia vive em `<Projeto>/Pendencias/<slug>/` com ate 4 arquivos:
+
+| Arquivo | Estagio | Conteudo |
+|---|---|---|
+| `spec.md` | aberta | O que e por que (contexto, problema, criterios) |
+| `task.md` | planejamento | Como (passos, dependencias, riscos) |
+| `tests.md` | pronta | O que provar (casos de teste em linguagem natural) |
+| `resultado.md` | realizada | O que aconteceu (commits, files, decisoes) |
+
+**Estado e definido pela presenca de arquivos** — nao tem campo `status:` pra esquecer.
+
+### Skills
+
+- `/pendencia new <projeto>/<slug>` — cria pasta + spec.md
+- `/pendencia next [<slug>]` — avanca pro proximo estagio (gera task / tests / dispara TDD / fecha)
+- `/pendencia status [<projeto>]` — lista pendencias por estagio
+- `/pendencia migrate <projeto>` — converte `.md` soltos legados
+- `/project-new <nome>` — cria projeto novo no vault (so vault, codigo vem depois)
+
+### Captura mobile
+
+O Modal Form de captura agora cria `<Projeto>/Pendencias/<slug>/spec.md` direto (em vez de `Notas Pendentes/`). Pergunta projeto + slug. Slug e normalizado client-side.
+
+### Migracao do formato antigo
+
+Projetos com `<Projeto>/Pendencias/*.md` soltos (formato antigo) sao migrados via `/pendencia migrate <projeto>`. A operacao e idempotente — pode ser feita aos poucos.
+
+---
+
 ## Setup
 
 Voce tem duas opcoes:

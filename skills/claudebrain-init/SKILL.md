@@ -6,7 +6,7 @@ trigger: /claudebrain-init
 
 # /claudebrain-init
 
-Bootstrap conversacional do ClaudeBrain. NAO ha install.sh — voce (agente) guia o usuario por 8 fases, pergunta antes de cada uma, aplica so o aprovado.
+Bootstrap conversacional do ClaudeBrain. NAO ha install.sh — voce (agente) guia o usuario por 10 fases, pergunta antes de cada uma, aplica so o aprovado.
 
 ## Usage
 
@@ -35,7 +35,7 @@ Se nao existir, pare e diga ao usuario:
 
 Argumentos validos (todos opcionais):
 - `--dry-run` — passar pra todos os sub-scripts; nada escrito em disco.
-- `--only <lista>` — comma-separated phase numbers (1,2,3...). Default: todas (1..8).
+- `--only <lista>` — comma-separated phase numbers (1,2,3...). Default: todas (1..10).
 
 Se houver argumento que voce nao reconheca, pergunte ao usuario antes de continuar.
 
@@ -214,10 +214,46 @@ Setup completo. Verifique:
 
 ---
 
+## Phase 9 — Install /pendencia skill
+
+**Quando pular**: se `~/.claude/skills/pendencia/SKILL.md` ja existir e for symlink pra `$REPO/skills/pendencia/SKILL.md`.
+
+**Pergunta**: "Instalar a skill `/pendencia` (gerencia cascata de pendencias)?"
+
+Aplicar:
+```bash
+bash "$REPO/scripts/install-pendencia.sh"
+```
+
+Verificar:
+```bash
+test -L "$HOME/.claude/skills/pendencia/SKILL.md" && echo OK
+```
+
+---
+
+## Phase 10 — Install /project-new skill
+
+**Quando pular**: se `~/.claude/skills/project-new/SKILL.md` ja existir e for symlink pra `$REPO/skills/project-new/SKILL.md`.
+
+**Pergunta**: "Instalar a skill `/project-new` (bootstrap vault de projetos novos)?"
+
+Aplicar:
+```bash
+bash "$REPO/scripts/install-project-new.sh"
+```
+
+Verificar:
+```bash
+test -L "$HOME/.claude/skills/project-new/SKILL.md" && echo OK
+```
+
+---
+
 ## Notas pro agente executor
 
 - **NAO use TaskCreate pra fases**: usa AskUserQuestion. As fases sao decisoes do usuario, nao TODO do agente.
 - **Mantenha estado em memoria** entre fases (lista de projetos integrados, escolhas do usuario).
 - **Em caso de erro num sub-script**: nao siga em frente. Mostre o erro, pergunte ao usuario se quer abortar ou continuar pulando a fase.
 - **Dry-run global**: se `--dry-run` foi passado, propague pra TODOS os sub-scripts. Continue perguntando, so nao escreve.
-- **`--only`**: respeite exatamente. Se `--only 3,4`, nao pergunte sobre 1,2,5,6,7,8. Mas RODE Step 2 (detect_state) sempre — voce precisa do estado pra decidir o que mostrar.
+- **`--only`**: respeite exatamente. Se `--only 3,4`, nao pergunte sobre 1,2,5,6,7,8,9,10. Mas RODE Step 2 (detect_state) sempre — voce precisa do estado pra decidir o que mostrar.
