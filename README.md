@@ -21,15 +21,15 @@ A estrutura nao e arbitraria. Cada pasta tem um proposito explicito ligado a **c
 
 ```
 ClaudeBrain/
-├── Index.md                 hub central — KPIs, projetos, capturas
+├── Index.md                 hub central — KPIs, projetos, pendencias por estagio
 ├── Capturar.md              pagina-form pra criar nota nova
-├── Notas Pendentes/         INBOX — captures aguardando triagem
+├── Notas Pendentes/         legado (captura antiga; deprecated apos cascata)
 ├── Templates/
-│   └── Captura.md           template do form (DataviewJS + Modal Forms)
+│   └── Captura.md           template do form (cria pendencia em cascata)
 ├── _seeds/                  notas-stub que alimentam autocomplete (status, etc)
 └── <Projeto>/               UM por projeto sob ~/PROJETOS
     ├── <Projeto>.md         hub do projeto (frontmatter + wikilinks)
-    ├── Pendencias/          itens acionaveis nao resolvidos
+    ├── Pendencias/<slug>/   cascata: spec.md / task.md / tests.md / resultado.md
     ├── Geral/               conhecimento operacional recorrente
     ├── _root/               notas geradas de arquivos no root do projeto
     ├── _communities/        notas-resumo por cluster do graphify
@@ -42,15 +42,13 @@ ClaudeBrain/
 
 ### Por que essas pastas existem
 
-#### `Notas Pendentes/` — INBOX
-Quando voce captura uma ideia rapida (botao "Nova captura" no Index, ou Cmd+P → Templater), a nota cai aqui. **Nunca diretamente num projeto.** Isso evita decisoes prematuras: voce captura agora, decide depois onde ela mora.
+#### `Notas Pendentes/` — legado (deprecated)
+Era a INBOX onde captures caiam pra triagem manual posterior. **Deprecated** apos a chegada da cascata: o Modal Form agora pergunta projeto + slug e cria direto `<Projeto>/Pendencias/<slug>/spec.md`. Capturas existentes em `Notas Pendentes/` continuam la ate voce migrar manualmente.
 
-A nota tem `status: pendente` no frontmatter. Quando voce processar (triar) — move pra `Pendencias/` ou `Geral/` do projeto correspondente, ou deleta.
+#### `<Projeto>/Pendencias/<slug>/` — cascata acionavel
+Cada pendencia e uma **pasta** com ate 4 arquivos: `spec.md`, `task.md`, `tests.md`, `resultado.md`. Estado e definido pela presenca de arquivos (sem campo `status:` pra esquecer). Detalhes na secao "Cascata de pendencias" abaixo.
 
-#### `<Projeto>/Pendencias/` — itens acionaveis
-Bugs conhecidos, TODOs, decisoes a tomar, configuracoes manuais a fazer. Tudo o que demanda **acao futura**. Aqui voce escreve a mao (depois de triagem ou direto pro projeto).
-
-A regra: se voce ler a nota e nao houver nada pra fazer, ela nao pertence aqui — pertence a `Geral/`.
+A regra: se voce ler a nota e nao houver nada pra fazer, nem comecou — entao nem deveria ser pendencia. Mova pra `Geral/`.
 
 #### `<Projeto>/Geral/` — conhecimento operacional
 Comandos de deploy memorizados, URLs importantes, decisoes arquiteturais que voce nao quer perder, referencias a secrets em 1Password, paths de keystores, env vars necessarias.
@@ -77,7 +75,7 @@ Por que? **Quando voce procura por algo no Obsidian, a estrutura mental bate com
 ### Pastas no nivel raiz (`<root>/`)
 
 #### `Templates/`
-Templates do Templater. Por enquanto so tem `Captura.md` (que abre o Modal Form e cria nota em `Notas Pendentes/`). Voce adiciona mais conforme precisar.
+Templates do Templater. Por enquanto so tem `Captura.md` (que abre o Modal Form e cria pendencia em cascata em `<Projeto>/Pendencias/<slug>/spec.md`). Voce adiciona mais conforme precisar.
 
 #### `_seeds/`
 Notas curtas que existem **so pra alimentar o autocomplete** do Obsidian. Por exemplo: 3 notas com `status: pendente`, `status: feito`, `status: cancelado`. Quando voce clica no campo `status` de qualquer nota, Obsidian sugere essas 3 opcoes.
@@ -186,23 +184,44 @@ Veja `docs/SETUP.md` pro passo-a-passo. Resumido:
 
 | Comando | O que faz |
 |---|---|
-| **Cmd+P → Templater: Captura** | abre form, cria nota em `Notas Pendentes/` |
+| **Cmd+P → Templater: Captura** | abre form, cria pendencia em `<Projeto>/Pendencias/<slug>/spec.md` |
 | **Cmd+P → Shell commands: Execute: ClaudeBrain: Atualizar tudo** | detecta projetos novos em `~/PROJETOS`, integra; roda `graphify update` em todos |
 | **Botao "Atualizar tudo" no Index** | mesma coisa que acima |
 | **Botao "Nova captura" no Index** | mesma coisa que Templater Captura |
+| **`/pendencia next [<slug>]`** | avanca pendencia no proximo estagio (no Claude Code) |
+| **`/pendencia status [<projeto>]`** | lista pendencias por estagio |
+| **`/pendencia migrate <projeto>`** | converte `.md` soltos legados pra cascata |
+| **`/project-new <nome>`** | bootstrap vault-only de projeto novo |
 
 ---
 
-## Filosofia de captura → triagem
+## Filosofia: captura -> cascata
 
-Inspirado no PARA do Tiago Forte + na "LLM Wiki" do Karpathy:
+Inspirado no PARA do Tiago Forte + na "LLM Wiki" do Karpathy + TDD:
 
-1. **Captura**: rapido, sem decidir onde fica. Nota cai em `Notas Pendentes/` com `status: pendente`.
-2. **Revisao**: voltando pro Mac, voce abre o Index → tab "Notas Pendentes" → triagem nota a nota.
-3. **Triagem**: ou move pra `<projeto>/Pendencias/` (acionavel), ou pra `<projeto>/Geral/` (referencia), ou deleta.
-4. **Processamento**: o `claudebrain-update.sh` re-roda o graphify pra incorporar tudo no grafo.
+1. **Captura** (mobile ou Mac): Modal Form pergunta projeto + slug + descricao. Cria `<Projeto>/Pendencias/<slug>/spec.md` direto. Decisao minima na hora — slug e projeto.
+2. **Refinamento via cascata**: `/pendencia next <slug>` gera `task.md` (passos), depois `tests.md` (casos de teste em linguagem natural), depois dispara TDD no codigo real, depois fecha com `resultado.md`.
+3. **Revisitar**: Index mostra pendencias por estagio (aberta / planejamento / pronta / realizada). Filtra por projeto.
+4. **Processamento**: `claudebrain-update.sh` re-roda graphify pra incorporar tudo no grafo.
 
-Resultado: voce nao decide na hora. Captura sempre. Decide quando esta com a cabeca pra isso.
+Resultado: voce captura rapido, decide profundidade depois, e cada pendencia carrega rastreio uniforme do "o que queria" ate "o que entregou".
+
+---
+
+## Memoria / contexto pro Claude Code
+
+Quatro lugares ortogonais, sem overlap:
+
+| Lugar | Papel | Auto-carrega? |
+|---|---|---|
+| `~/.claude/CLAUDE.md` | Convencoes globais (todos os projetos) | Sim, sempre |
+| `<projeto>/CLAUDE.md` | Convencoes do projeto + decisao "onde poe?" | Sim, quando CWD=projeto |
+| `<projeto>/notes/Geral/` | Conhecimento operacional (comandos, decisoes, URLs) | Nao (Claude le on-demand) |
+| `~/.claude/projects/<encoded>/memory/` | `session_*.md` (gerado por `/save-session`) + feedback cross-projeto | `MEMORY.md` sim |
+
+A regra **onde colocar coisa nova** vive embutida no `<projeto>/CLAUDE.md` (veja exemplo em `CLAUDE.md` na raiz deste repo). Isso elimina a duvida "memory/ ou notes/Geral/?".
+
+Piloto rodando neste repo. Skill `/claude-md-init` pra rollout em outros projetos esta como decisao adiada.
 
 ---
 
