@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 3: Run test to verify it fails**
 
-Run: `cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_classify -v`
+Run: `cd ~/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_classify -v`
 Expected: FAIL with import error (`scripts/pendencia/classify.py` missing).
 
 - [ ] **Step 4: Implement classify.py**
@@ -281,7 +281,7 @@ def count_legado(pendencias_dir: Path) -> int:
 
 - [ ] **Step 5: Run tests to verify they pass**
 
-Run: `cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_classify -v`
+Run: `cd ~/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_classify -v`
 Expected: PASS on all 14 tests.
 
 - [ ] **Step 6: Commit**
@@ -371,7 +371,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_slug -v`
+Run: `cd ~/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_slug -v`
 Expected: FAIL with import error.
 
 - [ ] **Step 3: Implement slug.py**
@@ -426,7 +426,7 @@ def resolve_conflict(parent: Path, slug: str) -> str:
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_slug -v`
+Run: `cd ~/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_slug -v`
 Expected: PASS on all 11 tests.
 
 - [ ] **Step 5: Commit**
@@ -718,7 +718,7 @@ if __name__ == "__main__":
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_migrate -v`
+Run: `cd ~/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_migrate -v`
 Expected: FAIL with import error.
 
 - [ ] **Step 3: Implement migrate.py**
@@ -848,7 +848,7 @@ def _infer_project_from_plan(plan: list[Migration], pendencias_dir: Path) -> str
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_migrate -v`
+Run: `cd ~/PROJETOS/claude-brain && python -m unittest tests.test_pendencia_migrate -v`
 Expected: PASS on all 9 tests.
 
 Note: tests pass `project="HMA"` explicitly because the helper folder structure is `<tmp>/Pendencias/`. The function uses `pendencias_dir.parent.name` (which is the temp dir name) but accepts an explicit override path in tests via the param signature.
@@ -1813,7 +1813,7 @@ git commit -m "docs: secao da cascata de pendencias no README"
 - [ ] **Step 1: Run full test suite**
 
 ```bash
-cd /Users/guilhermeferreira/PROJETOS/claude-brain && python -m unittest discover tests -v
+cd ~/PROJETOS/claude-brain && python -m unittest discover tests -v
 ```
 
 Expected: PASS on all tests (existing + new).

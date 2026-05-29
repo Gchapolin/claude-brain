@@ -152,10 +152,10 @@ Sem mudanca. `/save-session` continua gerando `notes/Sessoes/<timestamp>.md` e `
 
 ## Fluxo end-to-end (exemplo)
 
-1. **Captura mobile**: usuario captura via Modal Form: projeto=`HarmonicMapApp`, slug=`oauth-apple`, conteudo="Adicionar Sign in with Apple, ja temos Google. iOS so."
-   → Cria `HarmonicMapApp/Pendencias/oauth-apple/spec.md`.
+1. **Captura mobile**: usuario captura via Modal Form: projeto=`MyApp`, slug=`oauth-apple`, conteudo="Adicionar Sign in with Apple, ja temos Google. iOS so."
+   → Cria `MyApp/Pendencias/oauth-apple/spec.md`.
 
-2. **No Mac, refinar spec**: usuario abre Claude Code em `~/PROJETOS/HarmonicMapApp/`, roda `/pendencia next oauth-apple`.
+2. **No Mac, refinar spec**: usuario abre Claude Code em `~/PROJETOS/MyApp/`, roda `/pendencia next oauth-apple`.
    → Skill detecta so `spec.md`. Anuncia: "Vou gerar task.md a partir do spec. Ok?". Usuario aprova.
    → Gera `task.md` com passos (configurar Apple Developer, integrar SDK, callback, store de tokens).
 
@@ -168,7 +168,7 @@ Sem mudanca. `/save-session` continua gerando `notes/Sessoes/<timestamp>.md` e `
 5. **Fechar**: roda `/pendencia next oauth-apple`.
    → Detecta implementacao concluida (ha commits relacionados desde tests.md). Gera `resultado.md` listando commits, files alterados, decisoes feitas, follow-ups (ex: "ainda falta UI de unlink").
 
-6. **Index.md** mostra `HarmonicMapApp / realizada: +1`.
+6. **Index.md** mostra `MyApp / realizada: +1`.
 
 ## Migracao de projetos existentes
 
