@@ -1,6 +1,6 @@
 ---
 name: save-session
-description: "Salva resumo estruturado da sessao atual do Claude Code em dois lugares: notes/Sessoes/ do projeto (visivel no vault Obsidian) e memory/ do projeto (auto-carregado no inicio de sessoes futuras). Inline, sem chamar API."
+description: "Salva resumo estruturado da sessao atual do Claude Code em dois lugares: notes/Sessoes/ do projeto (visivel no vault Obsidian) e memory/ do projeto (auto-carregado no inicio de sessoes futuras). Depois atualiza o grafo graphify do projeto (update incremental + export obsidian + hub). Inline, sem chamar API."
 trigger: /save-session
 ---
 
@@ -10,14 +10,17 @@ Gera um resumo estruturado da CONVERSA ATUAL e salva em dois lugares:
 1. **Vault Obsidian**: `<projetos>/<projeto>/notes/Sessoes/<timestamp>.md` — visivel no Obsidian, indexado por graphify, espelhado pro iCloud
 2. **Memory do projeto**: `~/.claude/projects/<encoded-cwd>/memory/session_<timestamp>.md` — auto-carregado pelo harness no inicio da proxima sessao via `MEMORY.md`
 
+Depois de salvar, atualiza o grafo graphify do projeto (Step 4) pra que a sessao recem-salva e qualquer arquivo alterado entrem no grafo e no vault imediatamente.
+
 Voce (Claude) e quem escreve. Use o que esta no contexto desta conversa — nao chame API externa, nao tente reler transcript do disco.
 
 ## Usage
 
 ```
-/save-session                  # salva sessao corrente nos dois lugares
+/save-session                  # salva sessao corrente nos dois lugares + atualiza graphify
 /save-session --note "X"       # adiciona observacao livre no rodape do resumo
-/save-session --dry-run        # mostra o markdown que escreveria, sem salvar
+/save-session --no-graph       # salva sem atualizar o grafo (save rapido)
+/save-session --dry-run        # mostra o markdown que escreveria, sem salvar nem atualizar grafo
 ```
 
 ## What you MUST do when invoked
@@ -104,7 +107,23 @@ Crie os diretorios se nao existirem (`mkdir -p`).
    - Formato da entrada: `- [Sessao YYYY-MM-DD HH:MM](session_$TIMESTAMP.md) — <Intent resumido em 1 linha>`
    - Limite: manter no maximo 20 entradas mais recentes em MEMORY.md (o harness corta apos 200 linhas; cada entrada deve caber em 1 linha curta)
 
-### Step 4 — Confirmar pro usuario
+### Step 4 — Atualizar o grafo graphify do projeto
+
+Pule este step inteiro (sem erro) se: `--no-graph` ou `--dry-run` foi passado, OU `$PROJETOS_ROOT/$PROJECT/graphify-out/` nao existe (nesse caso mencione na confirmacao que vale rodar `/graphify` uma vez pra criar o grafo).
+
+1. **Update incremental do grafo**: siga o fluxo `--update` da skill graphify (`~/.claude/skills/graphify/SKILL.md`, secao "For --update") com `INPUT_PATH = $PROJETOS_ROOT/$PROJECT`. Isso re-extrai apenas arquivos novos/alterados desde o ultimo manifest — incluindo a sessao que voce acabou de salvar — e regenera `graph.json`, `GRAPH_REPORT.md` e `graph.html`. Como a sessao e um `.md` (nao code-only), a extracao semantica via subagente roda para os arquivos novos; o resto vem do cache.
+2. **Re-exportar o vault Obsidian** (as notas que o ClaudeBrain enxerga via symlink):
+   ```bash
+   cd "$PROJETOS_ROOT/$PROJECT" && graphify export obsidian
+   ```
+3. **Reorganizar e reconstruir o hub** — resolva `REPO = $(cat ~/.claude/skills/claudebrain-init/.repo-path)` (fallback `~/PROJETOS/claude-brain`; se nao existir, pule com aviso):
+   ```bash
+   python3 "$REPO/scripts/reorganize_vault.py" "$PROJETOS_ROOT/$PROJECT/graphify-out/obsidian"
+   python3 "$REPO/scripts/build_project_hubs.py" "$PROJECT"
+   ```
+4. Se qualquer sub-passo falhar, NAO desfaca o save (Steps 1-3 ja estao no disco); reporte o erro na confirmacao e siga em frente.
+
+### Step 5 — Confirmar pro usuario
 
 Imprima:
 ```
@@ -112,11 +131,13 @@ Sessao salva:
   Vault:   <VAULT_FILE>
   Memory:  <MEMORY_FILE>
   Index:   $MEMORY_DIR/MEMORY.md (entrada adicionada no topo)
+  Grafo:   <resultado do Step 4 — ex: "atualizado (N nos, M arestas, hub re-gerado)",
+            "pulado (--no-graph)", "pulado (sem graphify-out/)" ou o erro ocorrido>
 ```
 
-### Step 5 — Dry-run
+### Step 6 — Dry-run
 
-Se `--dry-run` foi passado, NAO escreva nada. So mostre o markdown que escreveria + os 3 paths de destino.
+Se `--dry-run` foi passado, NAO escreva nada e NAO atualize o grafo. So mostre o markdown que escreveria + os 3 paths de destino.
 
 ## Notas pro agente executor
 
@@ -126,3 +147,5 @@ Se `--dry-run` foi passado, NAO escreva nada. So mostre o markdown que escreveri
 - **Se CWD nao parecer ser um projeto** (ex: ~/Downloads): pergunte ao usuario qual projeto associar antes de salvar.
 - **Encoded-cwd format**: o harness usa `~/.claude/projects/<cwd-with-slashes-replaced-by-hifens>/`. Exemplo: `/Users/foo/PROJETOS/claude-brain` -> `-Users-foo-PROJETOS-claude-brain`.
 - **Idempotente em re-runs proximos**: se voce rodar `/save-session` 2x no mesmo minuto, o segundo overwrite-ria o primeiro (mesmo timestamp em minutos). Se for um problema, adicione `-2` ao timestamp.
+- **Custo do Step 4**: o update incremental so re-extrai arquivos novos/alterados (normalmente a propria sessao + o que mudou na conversa) — custo pequeno de LLM e ~1-3 min. Se o usuario quiser o save instantaneo, e so passar `--no-graph`.
+- **Symlinks no detect**: `notes/Sessoes` pode ser symlink pro iCloud. Se o detect do graphify nao seguir o symlink e a sessao nao aparecer entre os arquivos novos do update, mencione isso na confirmacao em vez de silenciar.
