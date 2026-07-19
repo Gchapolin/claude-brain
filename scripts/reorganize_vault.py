@@ -6,6 +6,25 @@ import re
 import shutil
 from pathlib import Path
 
+
+def dest_escapes_vault(vault_dir: Path, dest: Path) -> bool:
+    """True se escrever em dest sairia do vault por um symlink no caminho.
+
+    Vaults ClaudeBrain contem symlinks pro projeto real (ex. docs/superpowers,
+    Geral -> notes/Geral no iCloud). Um move pra vault/docs/superpowers/x.md
+    atravessa o link e ESCREVE NO PROJETO — poluindo o corpus com arquivos de
+    no que o graphify re-ingere na proxima build (grafo dobra de tamanho).
+    Verifica o ancestral existente mais profundo de dest via resolve().
+    """
+    vault_real = vault_dir.resolve()
+    cur = dest.parent
+    while not cur.exists():
+        if cur == cur.parent:
+            return False
+        cur = cur.parent
+    cur_real = cur.resolve()
+    return cur_real != vault_real and vault_real not in cur_real.parents
+
 def get_frontmatter(md_path: Path):
     try:
         text = md_path.read_text(encoding='utf-8', errors='replace')
@@ -97,6 +116,11 @@ def reorganize(vault_dir: Path):
                     dest = vault_dir / name
             else:
                 dest = vault_dir / '_misc' / name
+
+        if dest_escapes_vault(vault_dir, dest):
+            # Caminho espelhado cai num symlink pro projeto real — manter a
+            # nota DENTRO do vault em _misc em vez de escrever atraves do link.
+            dest = vault_dir / '_misc' / name
 
         if dest != md:
             moves.append((md, dest))
