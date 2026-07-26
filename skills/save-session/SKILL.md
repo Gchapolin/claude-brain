@@ -112,6 +112,25 @@ Crie os diretorios se nao existirem (`mkdir -p`).
 Pule este step inteiro (sem erro) se: `--no-graph` ou `--dry-run` foi passado, OU `$PROJETOS_ROOT/$PROJECT/graphify-out/` nao existe (nesse caso mencione na confirmacao que vale rodar `/graphify` uma vez pra criar o grafo).
 
 1. **Update incremental do grafo**: siga o fluxo `--update` da skill graphify (`~/.claude/skills/graphify/SKILL.md`, secao "For --update") com `INPUT_PATH = $PROJETOS_ROOT/$PROJECT`. Isso re-extrai apenas arquivos novos/alterados desde o ultimo manifest — incluindo a sessao que voce acabou de salvar — e regenera `graph.json`, `GRAPH_REPORT.md` e `graph.html`. Como a sessao e um `.md` (nao code-only), a extracao semantica via subagente roda para os arquivos novos; o resto vem do cache.
+
+   **OBRIGATORIO: passe `follow_symlinks=True` no `detect_incremental`:**
+   ```python
+   result = detect_incremental(Path('INPUT_PATH'), follow_symlinks=True)
+   ```
+   `notes/Sessoes`, `notes/Geral` e `notes/Pendencias` sao symlinks de DIRETORIO pro iCloud, e o
+   default do graphify e `follow_symlinks=False` — sem a flag o `os.walk` nao desce neles e a
+   sessao que voce acabou de salvar NUNCA entra no grafo. Medido em Tonika 2026-07-25: 877
+   arquivos sem a flag, 1011 com ela; os 134 a mais sao exatamente as notas do vault
+   (Sessoes 55, Geral 48, Pendencias 31).
+   Symlinks de ARQUIVO (ex: os 33 do motor compartilhado em `android/engine/`) NAO precisam da
+   flag — `os.walk` ja os lista como arquivos, e e por isso que o problema ficou tanto tempo
+   invisivel: parte dos symlinks do projeto sempre funcionou.
+   Nao ha duplicacao pelos symlinks cruzados do vault
+   (`graphify-out/obsidian/Pendencias -> notes/Pendencias -> iCloud`): o graphify ignora
+   `graphify-out/` inteiro, entao aquele lado nunca e caminhado — verificado, 0 caminhos novos
+   ali dentro. A protecao de ciclo do `detect` (detect.py:663) so cobre auto-contencao direta,
+   entao se algum dia surgir um symlink de diretorio FORA de `graphify-out/` apontando pra
+   dentro do proprio projeto, medir antes de confiar.
 2. **Re-exportar o vault Obsidian** (as notas que o ClaudeBrain enxerga via symlink):
    ```bash
    cd "$PROJETOS_ROOT/$PROJECT" && graphify export obsidian
@@ -148,4 +167,11 @@ Se `--dry-run` foi passado, NAO escreva nada e NAO atualize o grafo. So mostre o
 - **Encoded-cwd format**: o harness usa `~/.claude/projects/<cwd-with-slashes-replaced-by-hifens>/`. Exemplo: `/Users/foo/PROJETOS/claude-brain` -> `-Users-foo-PROJETOS-claude-brain`.
 - **Idempotente em re-runs proximos**: se voce rodar `/save-session` 2x no mesmo minuto, o segundo overwrite-ria o primeiro (mesmo timestamp em minutos). Se for um problema, adicione `-2` ao timestamp.
 - **Custo do Step 4**: o update incremental so re-extrai arquivos novos/alterados (normalmente a propria sessao + o que mudou na conversa) — custo pequeno de LLM e ~1-3 min. Se o usuario quiser o save instantaneo, e so passar `--no-graph`.
-- **Symlinks no detect**: `notes/Sessoes` pode ser symlink pro iCloud. Se o detect do graphify nao seguir o symlink e a sessao nao aparecer entre os arquivos novos do update, mencione isso na confirmacao em vez de silenciar.
+- **Symlinks no detect**: resolvido com `follow_symlinks=True` no Step 4 (ver detalhe la). Se
+  mesmo assim a sessao nao aparecer entre os arquivos novos do update, mencione na confirmacao em
+  vez de silenciar.
+- **Tokens de saida no cost.json do graphify sao sempre 0**: os chunks JSON dos subagentes nascem
+  com `input_tokens`/`output_tokens` zerados e o orquestrador tem de escrever os reais por cima,
+  mas o tool result do Agent expoe so um total combinado (`subagent_tokens`), sem separar entrada
+  de saida. Atribua o total a `input_tokens` (e onde esta o volume, ao ler arquivos) e NAO trate
+  o numero de saida acumulado como real — ele e artefato, nao medida.
