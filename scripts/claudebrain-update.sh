@@ -141,6 +141,19 @@ for d in "$PROJETOS"/*/; do
     fi
 done
 
+# Memoria do harness (~/.claude/projects/<nome>/memory) no iCloud via symlink.
+# Idempotente: cria symlinks pra pastas que ja estao no iCloud e migra pastas
+# locais novas. Ver scripts/init/link_claude_memory.sh.
+MEMORY_LINKED=0
+LINK_MEM="$REPO/scripts/init/link_claude_memory.sh"
+if [ -f "$LINK_MEM" ] && [ -d "$ICLOUD" ]; then
+    if mem_out="$(bash "$LINK_MEM" "$ICLOUD" 2>&1)"; then
+        MEMORY_LINKED=$(printf '%s\n' "$mem_out" | grep -cE '^(LINK|MIGRADO|MESCLADO) ' || true)
+    else
+        ERRORS+=("link_claude_memory falhou: $(printf '%s' "$mem_out" | tail -1)")
+    fi
+fi
+
 # Reconcilia o dropdown do Modal Forms SEMPRE (idempotente).
 # Lista todos os projetos em $PROJETOS minus DROPDOWN_SKIP, e usa --mode add.
 # Inclui projetos que o usuario adicionou ao vault manualmente (sem passar
@@ -198,6 +211,7 @@ echo "Grafos atualizados: ${#UPDATED_GRAPHS[@]}"
 [ ${#UPDATED_GRAPHS[@]} -gt 0 ] && printf '  - %s\n' "${UPDATED_GRAPHS[@]}"
 echo "Projetos novos: ${#NEW_PROJECTS[@]}"
 [ ${#NEW_PROJECTS[@]} -gt 0 ] && printf '  + %s\n' "${NEW_PROJECTS[@]}"
+echo "Memoria no iCloud (novos symlinks/migracoes): $MEMORY_LINKED"
 echo "Auto-detect (catch-up): ${#RECONCILED[@]}"
 [ ${#RECONCILED[@]} -gt 0 ] && printf '  > %s\n' "${RECONCILED[@]}"
 [ -z "$GRAPHIFY_BIN" ] && echo "AVISO: graphify nao esta no PATH — updates de grafo pulados"

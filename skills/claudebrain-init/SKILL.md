@@ -172,6 +172,21 @@ bash "$REPO/scripts/init/setup_icloud_sync.sh" \
     [--dry-run]
 ```
 
+**Memoria do Claude Code** (uma vez, nao por projeto). A memoria do harness em
+`~/.claude/projects/<nome>/memory/` nao sincroniza sozinha. Este passo move cada
+pasta pra `<ICLOUD_DIR>/_claude-memory/<nome>/` e deixa symlink no lugar; em um Mac
+novo, so cria os symlinks pras pastas que ja chegaram pelo iCloud.
+
+**Pergunta**: "Manter a memoria do Claude Code no iCloud (symlink)? Mostro o dry-run antes."
+
+```bash
+bash "$REPO/scripts/init/link_claude_memory.sh" "$ICLOUD_DIR" --dry-run
+bash "$REPO/scripts/init/link_claude_memory.sh" "$ICLOUD_DIR"
+```
+
+`claudebrain-update.sh` roda o mesmo script a cada execucao, entao pastas de
+projetos novos entram no iCloud automaticamente.
+
 ---
 
 ## Phase 7 — CSS snippet (manual — nao automatizavel)

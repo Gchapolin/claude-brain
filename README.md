@@ -177,6 +177,7 @@ Veja `docs/SETUP.md` pro passo-a-passo. Resumido:
 5. Aplicar configs em `vault/.obsidian/plugins-config/*.json.example` (renomeie pra `data.json` na pasta do plugin)
 6. Copiar `scripts/claudebrain-update.sh` pra `~/.local/bin/` e dar permissao executavel
 7. Pra cada projeto, rodar `scripts/reorganize_vault.py <projeto/graphify-out/obsidian>` pra espelhar a estrutura
+8. Rodar `scripts/init/link_claude_memory.sh <icloud_dir>` pra levar a memoria do Claude Code (`~/.claude/projects/*/memory`) pro iCloud. Em um segundo Mac, o mesmo comando so cria os symlinks pras pastas que ja sincronizaram
 
 ---
 
@@ -217,7 +218,7 @@ Quatro lugares ortogonais, sem overlap:
 | `~/.claude/CLAUDE.md` | Convencoes globais (todos os projetos) | Sim, sempre |
 | `<projeto>/CLAUDE.md` | Convencoes do projeto + decisao "onde poe?" | Sim, quando CWD=projeto |
 | `<projeto>/notes/Geral/` | Conhecimento operacional (comandos, decisoes, URLs) | Nao (Claude le on-demand) |
-| `~/.claude/projects/<encoded>/memory/` | `session_*.md` (gerado por `/save-session`) + feedback cross-projeto | `MEMORY.md` sim |
+| `~/.claude/projects/<encoded>/memory/` | `session_*.md` (gerado por `/save-session`) + feedback cross-projeto. Symlink pra `<iCloud>/_claude-memory/<encoded>/`, sincroniza entre Macs (`scripts/init/link_claude_memory.sh`) | `MEMORY.md` sim |
 
 A regra **onde colocar coisa nova** vive embutida no `<projeto>/CLAUDE.md` (veja exemplo em `CLAUDE.md` na raiz deste repo). Isso elimina a duvida "memory/ ou notes/Geral/?".
 

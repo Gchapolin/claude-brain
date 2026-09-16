@@ -44,6 +44,7 @@ const pendIndex = {}; // { projeto: { slug: { spec:true, task:true, tests:true, 
 let legadoTotal = 0;
 const legadoByProj = {}; // { projeto: N }
 for (const p of dv.pages('').array()) {
+  if (p.file.path.startsWith('_claude-memory/')) continue; // memoria do Claude Code, nao e nota
   const parts = p.file.path.split('/');
   const idxPend = parts.indexOf('Pendencias');
   if (idxPend === -1 || idxPend === 0) continue;
