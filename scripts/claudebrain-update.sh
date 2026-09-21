@@ -205,6 +205,21 @@ if [ -f "$AUTOFRONT_REC" ]; then
     done
 fi
 
+# Divergencia entre os templates versionados (repo vault/) e o vault vivo.
+# So AVISA — deployar sozinho poderia sobrescrever edicao feita direto no
+# Obsidian. O deploy e explicito: scripts/install-vault-templates.sh.
+TEMPLATES_DRIFT=0
+VAULT_TPL="$REPO/scripts/install-vault-templates.sh"
+if [ -f "$VAULT_TPL" ]; then
+    if ! tpl_out="$(ICLOUD="$ICLOUD" MAC_VAULT="$MAC_VAULT" bash "$VAULT_TPL" --dry-run --check 2>&1)"; then
+        if printf '%s' "$tpl_out" | grep -q '^ERRO'; then
+            ERRORS+=("install-vault-templates: $(printf '%s' "$tpl_out" | grep '^ERRO' | head -1)")
+        else
+            TEMPLATES_DRIFT=1
+        fi
+    fi
+fi
+
 # Print summary
 echo "=== ClaudeBrain — Atualizar ==="
 echo "Grafos atualizados: ${#UPDATED_GRAPHS[@]}"
@@ -215,6 +230,7 @@ echo "Memoria no iCloud (novos symlinks/migracoes): $MEMORY_LINKED"
 echo "Auto-detect (catch-up): ${#RECONCILED[@]}"
 [ ${#RECONCILED[@]} -gt 0 ] && printf '  > %s\n' "${RECONCILED[@]}"
 [ -z "$GRAPHIFY_BIN" ] && echo "AVISO: graphify nao esta no PATH — updates de grafo pulados"
+[ "$TEMPLATES_DRIFT" -eq 1 ] && echo "AVISO: templates do vault divergem do repo — rode: bash $VAULT_TPL"
 [ ${#ERRORS[@]} -gt 0 ] && {
     echo "Erros: ${#ERRORS[@]}"
     printf '  ! %s\n' "${ERRORS[@]}"
