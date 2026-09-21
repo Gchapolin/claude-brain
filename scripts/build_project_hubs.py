@@ -13,12 +13,28 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from datetime import datetime
 from pathlib import Path
 
 DEFAULT_BASE = Path("~/PROJETOS").expanduser()
+
+
+def count_graph_nodes(project_dir: Path) -> int | None:
+    """Numero real de nodes em graphify-out/graph.json, ou None se indisponivel.
+
+    None cobre projeto sem grafo, graph.json corrompido e formato inesperado —
+    nesses casos o hub sai sem a chave e o Index trata como 0.
+    """
+    graph = project_dir / "graphify-out" / "graph.json"
+    try:
+        data = json.loads(graph.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    nodes = data.get("nodes") if isinstance(data, dict) else None
+    return len(nodes) if isinstance(nodes, list) else None
 
 
 def list_notes(vault: Path, project_name: str) -> list[Path]:
@@ -37,7 +53,9 @@ def list_notes(vault: Path, project_name: str) -> list[Path]:
     return notes
 
 
-def build_hub_content(project_name: str, notes: list[Path]) -> str:
+def build_hub_content(
+    project_name: str, notes: list[Path], graph_nodes: int | None = None
+) -> str:
     n = len(notes)
     today = datetime.now().strftime("%Y-%m-%d")
     lines = [
@@ -47,6 +65,10 @@ def build_hub_content(project_name: str, notes: list[Path]) -> str:
         f"created: {today}",
         "tags: [projecthub]",
         f"notes_count: {n}",
+    ]
+    if graph_nodes is not None:
+        lines.append(f"graph_nodes: {graph_nodes}")
+    lines += [
         "---",
         "",
         f"# {project_name}",
@@ -76,7 +98,7 @@ def make_project_hub(project: str, base: Path) -> bool:
     hub_file = notes_dir / f"{project}-hub.md"
 
     notes = list_notes(vault, project)
-    hub_file.write_text(build_hub_content(project, notes))
+    hub_file.write_text(build_hub_content(project, notes, count_graph_nodes(project_dir)))
 
     symlink = vault / f"{project}.md"
     if symlink.is_symlink() or symlink.exists():

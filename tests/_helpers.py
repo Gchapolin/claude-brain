@@ -30,3 +30,8 @@ def load_module(name: str, file_stem: str):
 def load_pendencia_module(name: str, file_stem: str):
     """Load <file_stem>.py from scripts/pendencia/."""
     return _load_from(PENDENCIA_DIR, name, file_stem)
+
+
+def load_script_module(name: str, file_stem: str):
+    """Load <file_stem>.py from scripts/ (raiz)."""
+    return _load_from(REPO_ROOT / "scripts", name, file_stem)

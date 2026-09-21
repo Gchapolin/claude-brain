@@ -99,13 +99,13 @@ const kpiCard = (v, l) => {
   wrap.createEl('div', { cls: 'v', text: String(v) });
   wrap.createEl('div', { cls: 'l', text: l });
 };
-const totalNotesGrafo = projects.reduce((s, p) => s + (p.notes_count || 0), 0);
+const totalNodesGrafo = projects.reduce((s, p) => s + (p.graph_nodes || 0), 0);
 kpiCard(projects.length, 'Projetos');
 kpiCard(globalCounts.aberta, 'Aberta');
 kpiCard(globalCounts.planejamento, 'Planejamento');
 kpiCard(globalCounts.pronta, 'Pronta');
 kpiCard(globalCounts.realizada, 'Realizada');
-kpiCard(totalNotesGrafo || '—', 'Nodes do grafo');
+kpiCard(totalNodesGrafo || '—', 'Nodes do grafo');
 
 // Legado banner
 if (legadoTotal > 0) {
@@ -175,7 +175,7 @@ function renderProjetos() {
           <td class="muted">${escapeHtml(p.description || '—')}</td>
           <td>${stackPills(p.stack)}</td>
           <td>${statusBadge(p)}</td>
-          <td class="num">${p.notes_count ?? '—'}</td>
+          <td class="num">${p.graph_nodes ?? '—'}</td>
           <td class="num">${p.no_graphify ? '—' : (p.notes_count ?? '—')}</td>
         </tr>`).join('')}
       </tbody>
@@ -215,5 +215,16 @@ content.addEventListener('click', (e) => {
 
 render();
 ```
+
+<div class="hints">
+<b>Nova captura</b>: abre o picker do Templater. Escolhe <i>Captura</i>, informa projeto + titulo, salva em <code>&lt;Projeto&gt;/Pendencias/&lt;slug&gt;/spec.md</code>. Funciona em Mac e iPad.<br>
+<b>Atualizar tudo</b>: detecta projetos novos em <code>~/PROJETOS</code>, cria estrutura no vault, roda <code>graphify update</code> nos projetos com codigo. So Mac.<br>
+<b>Pendencias</b>: a tab mostra a cascata por estagio — <code>spec</code> = aberta, <code>+task</code> = planejamento, <code>+tests</code> = pronta, <code>+resultado</code> = realizada.
+</div>
+
+---
+
+> [!info] Open-source
+> Versao publica deste setup (sem dados pessoais): [github.com/Gchapolin/claude-brain](https://github.com/Gchapolin/claude-brain) · MIT
 
 #hub #claudebrain #dataview
