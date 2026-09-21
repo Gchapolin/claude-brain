@@ -15,7 +15,7 @@ Setup opinativo de Obsidian como segundo cerebro de desenvolvimento. Combina gra
 
 - **Sem acentos** em qualquer texto (markdown, comentarios, commits, strings de erro).
 - **TDD obrigatorio** pra logica Python em `scripts/`. Test → fail → implement → pass → commit.
-- Tests rodam via `python -m unittest discover tests`.
+- Tests rodam via `python3 -m unittest discover tests` (pyenv aqui nao expoe shim `python`).
 - **Stdlib only** em Python. Nao adicionar dependencias sem confirmar.
 - Toda pendencia segue cascata `spec → task → tests → resultado` (ver `README.md` "Cascata de pendencias").
 - Skills sao instaladas via `bash scripts/install-<nome>.sh` (symlink + `.repo-path`).
@@ -38,6 +38,9 @@ Se a regra for ambigua pra um caso, ajuste a tabela acima — nao improvise.
 
 ## Pontos sensiveis
 
+- `vault/`: e **template versionado**, nao o vault vivo. Editar aqui nao muda o Obsidian —
+  precisa rodar `bash scripts/install-vault-templates.sh` (o `claudebrain-update.sh` so avisa
+  quando os dois divergem). Foi essa lacuna que deixou a cascata invisivel no vault por 4 meses.
 - `vault/Index.md`: dataviewjs frageis. Toda mudanca valida com `node -e "...new Function('dv','app', body)..."` antes de commitar.
 - `skills/*/SKILL.md`: frontmatter YAML obrigatorio. Validar com `python3 -c "import yaml; yaml.safe_load(...)"`.
 - `vault/Templates/Captura.md`: bloco `<%* %>` do Templater. Validar como JS com `node -e` antes de commitar.
@@ -48,17 +51,25 @@ Se a regra for ambigua pra um caso, ajuste a tabela acima — nao improvise.
 ## Comandos uteis
 
 ```bash
-python -m unittest discover tests          # roda tudo
+python3 -m unittest discover tests         # roda tudo
 bash scripts/install-pendencia.sh          # (re)instala skill /pendencia
 bash scripts/install-project-new.sh        # (re)instala skill /project-new
 bash scripts/install-skill.sh              # (re)instala /claudebrain-init
 bash scripts/install-save-session.sh       # (re)instala /save-session
 bash scripts/claudebrain-update.sh         # detecta projetos novos e integra
+bash scripts/install-vault-templates.sh    # deploya vault/ pro vault vivo (--dry-run pra so olhar)
+python3 scripts/build_project_hubs.py --all  # regenera hubs (notes_count + graph_nodes)
 ```
 
 ## Foco atual
 
-Cascata de pendencias acabou de ser mergeada (commit `c55047f`, branch `main`). Proximo passo natural: usar a cascata em um projeto real e iterar.
+Templates do `vault/` agora tem deploy explicito (`install-vault-templates.sh`) e o vault vivo
+foi atualizado pra cascata em 2026-09-21. As pendencias de KPI estao fechadas; o KPI "Nodes do
+grafo" usa `graph_nodes` real do `graph.json`.
+
+Proximo passo natural: migrar as pendencias flat que sobraram (`/pendencia migrate claude-brain`,
+tem `--dry-run`) e usar a cascata a partir do form de captura, que agora grava direto em
+`<Projeto>/Pendencias/<slug>/spec.md`.
 
 ## Anti-padroes
 
